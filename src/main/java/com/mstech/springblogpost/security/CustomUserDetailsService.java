@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import com.mstech.springblogpost.repositories.UserEntityRepository;
 import com.mstech.springblogpost.service.UserService;
 
 @Component
@@ -16,10 +17,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   private final UserService userService;
 
+  private final UserEntityRepository userEntityRepository;
+
   @Override
   public UserDetails loadUserByUsername(String username)
     throws UsernameNotFoundException {
-    var user = userService.findByEmail(username).orElseThrow();
+    var user = userEntityRepository.findByEmail(username).orElseThrow();
+    // var user = userService.findByEmail(username).orElseThrow();
 
     return UserPrincipal
       .builder()
