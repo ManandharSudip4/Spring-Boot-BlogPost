@@ -1,39 +1,39 @@
-// package com.mstech.springblogpost.entity;
+package com.mstech.springblogpost.entity;
 
-// import jakarta.persistence.Column;
-// import jakarta.persistence.Entity;
-// import jakarta.persistence.GeneratedValue;
-// import jakarta.persistence.GenerationType;
-// import jakarta.persistence.Id;
-// import jakarta.persistence.Lob;
-// import jakarta.persistence.Table;
-// import java.util.Date;
-// import lombok.Getter;
-// import lombok.Setter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
-// @Getter
-// @Setter
-// @Entity
-// @Table
-// public class BlogpostEntity {
+@Getter
+@Setter
+@Entity
+@Table(name = "blogs")
+public class BlogpostEntity {
 
-//   @Id
-//   @GeneratedValue(strategy = GenerationType.AUTO)
-//   @Column(name = "post_id")
-//   private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  @Column(name = "post_id")
+  private Long id;
 
-//   private Long catID;
+  private Long catID;
 
-//   @Column(nullable = false)
-//   private String title;
+  @Column(nullable = false)
+  private String title;
 
-//   private String content;
+  @Column(columnDefinition = "TEXT")
+  private String content;
+
+  @Column(name = "user_id")
+  private Long userId;
 
 
-//   private UserEntity userId;
+  private String thumbnailUrl;
 
-//   @Lob
-//   private byte[] thumbnail;
-
-//   private Date createdDate;
-// }
+  private Date createdDate;
+}
