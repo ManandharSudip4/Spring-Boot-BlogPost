@@ -4,9 +4,27 @@
 
 ## Postman Collection
 
-### Blogpost CRUD
+## Athentication
+### Register
+    URL: http://localhost:8080/auth/register
+    Token: Not Required
+    Body: {
+        "id": 6,
+        "email": "test@test.com",
+        "password": "$2a$12$5SVcO9FQI3ianmvk9Rx0cesKowL3E3NtlgCJhDV55qVI51AFjoqM2",
+        "role": "ROLE_GENERAL"
+    }
 
-#### Create
+### Login
+    URL: http://localhost:8080/auth/login
+    Token: Generated after Successful Login
+    Body: {
+        "email":"test@test.com",
+        "password":"pass"
+    }
+
+## Blogpost CRUD
+### Create
 
     URL: http://localhost:8080/api/v1/blog
     Token: Bearer token needs to be added to Authorization header
@@ -43,3 +61,15 @@
             "thumbnailUrl": "https://cdn.britannica.com/35/238335-050-2CB2EB8/Neymar-Messi-Argentina-Netherlands-World-Cup-Qatar-2022.jpg",
             "createdDate":"2023-08-28"
         }
+
+
+
+## Comments
+### Get comments by blog ID
+    URL: http://localhost:8080/api/v1/blog/352/comments
+    Token: ...
+
+
+### Post Comment
+    URL: http://localhost:8080/api/v1/blog/352/comments
+    Token: Required
