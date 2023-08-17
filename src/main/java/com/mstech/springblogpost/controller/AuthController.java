@@ -3,8 +3,6 @@ package com.mstech.springblogpost.controller;
 import com.mstech.springblogpost.entity.UserEntity;
 import com.mstech.springblogpost.model.LoginRequest;
 import com.mstech.springblogpost.model.LoginResponse;
-import com.mstech.springblogpost.security.JwtIssuer;
-import com.mstech.springblogpost.security.UserPrincipal;
 import com.mstech.springblogpost.service.AuthService;
 import com.mstech.springblogpost.service.UserEntityService;
 import lombok.RequiredArgsConstructor;

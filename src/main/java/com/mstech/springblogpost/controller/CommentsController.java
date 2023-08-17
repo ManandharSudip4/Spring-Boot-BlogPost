@@ -28,11 +28,11 @@ public class CommentsController {
   }
 
   @PostMapping("api/v1/blog/{blogId}/comments")
-  public void addComments(
+  public ResponseEntity<CommentEntity> addComments(
     @PathVariable("blogId") Long blogID,
     @RequestBody CommentEntity comments
   ) {
-    commentsService.addCommentsByBlogId(blogID, comments);
+    return commentsService.addCommentsByBlogId(blogID, comments);
   }
 
   @PutMapping("/comment/{commentId}")

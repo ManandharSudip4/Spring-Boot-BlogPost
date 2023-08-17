@@ -1,8 +1,6 @@
 package com.mstech.springblogpost.service;
 
-import com.mstech.springblogpost.entity.BlogEntity;
 import com.mstech.springblogpost.entity.CommentEntity;
-import com.mstech.springblogpost.exceptions.ResourceNotFoundException;
 import com.mstech.springblogpost.repositories.BlogpostRepository;
 import com.mstech.springblogpost.repositories.CommentsRepository;
 import jakarta.transaction.Transactional;
@@ -25,8 +23,11 @@ public class CommentsService {
     return new ResponseEntity<>(comment, HttpStatus.OK);
   }
 
-  public void addCommentsByBlogId(Long blogId, CommentEntity commentRequest) {
-    blogpostRepository
+  public ResponseEntity<CommentEntity> addCommentsByBlogId(
+    Long blogId,
+    CommentEntity commentRequest
+  ) {
+    CommentEntity comment = blogpostRepository
       .findById(blogId)
       .map(blog -> {
         commentRequest.setBlogEntity(blog);
@@ -34,6 +35,8 @@ public class CommentsService {
       })
       .orElseThrow(() -> new IllegalStateException("This blog does not exists")
       );
+
+    return new ResponseEntity<>(comment, HttpStatus.CREATED);
   }
 
   @Transactional
