@@ -14,11 +14,11 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "blogs")
-public class BlogpostEntity {
+public class BlogEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(name = "post_id")
+  @Column(name = "blog_id")
   private Long id;
 
   private Long catID;

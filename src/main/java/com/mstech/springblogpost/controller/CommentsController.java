@@ -4,6 +4,8 @@ import com.mstech.springblogpost.entity.CommentEntity;
 import com.mstech.springblogpost.service.CommentsService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +20,7 @@ public class CommentsController {
 
   private final CommentsService commentsService;
 
+
   @GetMapping("/comments")
   public List<CommentEntity> getCommentsForBlog(
     @PathVariable("blogId") Long blogID
@@ -29,9 +32,11 @@ public class CommentsController {
   public void addComments(
     @PathVariable("blogId") Long blogID,
     @RequestBody CommentEntity comments
-  ) {
-    // System.out.println(blogID);
+  ){
+    // System.out.println(comments.getUserId());
+    // System.out.println(comments.getBlogEntity().getId());
     // System.out.println(comments.getComment());
+    // System.out.println("This is a comment: "+ objectMapper.writeValueAsString(comments));
     commentsService.addCommentsByBlogId(blogID, comments);
   }
 }

@@ -1,10 +1,9 @@
 package com.mstech.springblogpost.service;
 
-import com.mstech.springblogpost.entity.BlogpostEntity;
+import com.mstech.springblogpost.entity.BlogEntity;
 import com.mstech.springblogpost.repositories.BlogpostRepository;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,17 +14,20 @@ public class BlogService {
 
   private final BlogpostRepository blogpostRepository;
 
-  public List<BlogpostEntity> getAllBlogs() {
+  public List<BlogEntity> getAllBlogs() {
     return blogpostRepository.findAll();
   }
 
-  public Optional<BlogpostEntity> getBlogByID(Long blogId) {
+  public BlogEntity getBlogByID(Long blogId) {
     System.out.println(blogId);
-    System.out.println(blogpostRepository.findById(blogId));
-    return blogpostRepository.findById(blogId);
+    BlogEntity myBlog = blogpostRepository
+      .findById(blogId)
+      .orElseThrow(() -> new IllegalStateException("This blog does not exists.")
+      );
+    return myBlog;
   }
 
-  public void addNewBlog(BlogpostEntity blog) {
+  public void addNewBlog(BlogEntity blog) {
     blogpostRepository.save(blog);
   }
 
@@ -42,8 +44,8 @@ public class BlogService {
   }
 
   @Transactional
-  public void updateBlog(Long blogID, BlogpostEntity blog) {
-    BlogpostEntity oldBlog = blogpostRepository
+  public void updateBlog(Long blogID, BlogEntity blog) {
+    BlogEntity oldBlog = blogpostRepository
       .findById(blogID)
       .orElseThrow(() -> new IllegalStateException("This blog does not exists.")
       );
