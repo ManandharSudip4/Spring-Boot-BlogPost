@@ -7,7 +7,6 @@ import com.mstech.springblogpost.repositories.UserEntityRepository;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,20 +21,28 @@ public class BlogService {
   private final GetUserFromJwt getUserFromJwt;
 
   public ResponseEntity<List<BlogEntity>> getAllBlogs() {
-    List<BlogEntity> blogs = blogpostRepository.findAll();
-    return new ResponseEntity<>(blogs, HttpStatus.OK);
+    try {
+      List<BlogEntity> blogs = blogpostRepository.findAll();
+      return new ResponseEntity<>(blogs, HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   public ResponseEntity<BlogEntity> getBlogByID(Long blogId) {
-    System.out.println(blogId);
-    BlogEntity myBlog = blogpostRepository
-      .findById(blogId)
-      .orElseThrow(() -> new IllegalStateException("This blog does not exists.")
-      );
-    // This is how we access UserEntity from Blog....
-    // UserEntity user = myBlog.getUserEntity();
-    // System.out.println("User Email: "+ user.getEmail());
-    return new ResponseEntity<>(myBlog, HttpStatus.OK);
+    try {
+      BlogEntity myBlog = blogpostRepository
+        .findById(blogId)
+        .orElseThrow(() ->
+          new IllegalStateException("This blog does not exists.")
+        );
+      // This is how we access UserEntity from Blog....
+      // UserEntity user = myBlog.getUserEntity();
+      // System.out.println("User Email: "+ user.getEmail());
+      return new ResponseEntity<>(myBlog, HttpStatus.OK);
+    } catch (Exception e) {
+      return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   public ResponseEntity<HttpStatus> addNewBlog(BlogEntity blog) {
@@ -49,7 +56,7 @@ public class BlogService {
       .orElseThrow(() -> new IllegalStateException("This blog does not exists")
       );
 
-      return new ResponseEntity<>(HttpStatus.CREATED);
+    return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
   public ResponseEntity<HttpStatus> deleteBlogByID(Long blogID) {
@@ -96,6 +103,9 @@ public class BlogService {
       oldBlog.setThumbnailUrl(thumbnail);
     }
 
-    return new ResponseEntity<>(blogpostRepository.save(oldBlog), HttpStatus.CREATED);
+    return new ResponseEntity<>(
+      blogpostRepository.save(oldBlog),
+      HttpStatus.CREATED
+    );
   }
 }
