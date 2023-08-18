@@ -40,9 +40,6 @@ public class CommentsController {
     @PathVariable("commentId") Long commentId,
     @RequestBody CommentEntity commentRequest
   ) {
-    System.out.println("Comment ID: " + commentId);
-    System.out.println("Comment: " + commentRequest.getComment());
-    // return null;
     return commentsService.updateComment(commentId, commentRequest);
   }
 

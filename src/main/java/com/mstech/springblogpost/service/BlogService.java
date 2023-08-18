@@ -1,10 +1,15 @@
 package com.mstech.springblogpost.service;
 
+import com.mstech.springblogpost.allfunctions.GetUserFromJwt;
 import com.mstech.springblogpost.entity.BlogEntity;
 import com.mstech.springblogpost.repositories.BlogpostRepository;
+import com.mstech.springblogpost.repositories.UserEntityRepository;
 import java.util.List;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,25 +18,41 @@ import org.springframework.transaction.annotation.Transactional;
 public class BlogService {
 
   private final BlogpostRepository blogpostRepository;
+  private final UserEntityRepository userEntityRepository;
+  private final GetUserFromJwt getUserFromJwt;
 
-  public List<BlogEntity> getAllBlogs() {
-    return blogpostRepository.findAll();
+  public ResponseEntity<List<BlogEntity>> getAllBlogs() {
+    List<BlogEntity> blogs = blogpostRepository.findAll();
+    return new ResponseEntity<>(blogs, HttpStatus.OK);
   }
 
-  public BlogEntity getBlogByID(Long blogId) {
+  public ResponseEntity<BlogEntity> getBlogByID(Long blogId) {
     System.out.println(blogId);
     BlogEntity myBlog = blogpostRepository
       .findById(blogId)
       .orElseThrow(() -> new IllegalStateException("This blog does not exists.")
       );
-    return myBlog;
+    // This is how we access UserEntity from Blog....
+    // UserEntity user = myBlog.getUserEntity();
+    // System.out.println("User Email: "+ user.getEmail());
+    return new ResponseEntity<>(myBlog, HttpStatus.OK);
   }
 
-  public void addNewBlog(BlogEntity blog) {
-    blogpostRepository.save(blog);
+  public ResponseEntity<HttpStatus> addNewBlog(BlogEntity blog) {
+    var myUser = getUserFromJwt.getCurrentActiveUser();
+    userEntityRepository
+      .findByEmail(myUser.getEmail())
+      .map(user -> {
+        blog.setUserEntity(user);
+        return blogpostRepository.save(blog);
+      })
+      .orElseThrow(() -> new IllegalStateException("This blog does not exists")
+      );
+
+      return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
-  public void deleteBlogByID(Long blogID) {
+  public ResponseEntity<HttpStatus> deleteBlogByID(Long blogID) {
     boolean exists = blogpostRepository.existsById(blogID);
 
     if (!exists) {
@@ -41,10 +62,12 @@ public class BlogService {
     }
 
     blogpostRepository.deleteById(blogID);
+
+    return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
   @Transactional
-  public void updateBlog(Long blogID, BlogEntity blog) {
+  public ResponseEntity<BlogEntity> updateBlog(Long blogID, BlogEntity blog) {
     BlogEntity oldBlog = blogpostRepository
       .findById(blogID)
       .orElseThrow(() -> new IllegalStateException("This blog does not exists.")
@@ -53,7 +76,6 @@ public class BlogService {
     Long catid = blog.getCatID();
     String title = blog.getTitle();
     String content = blog.getContent();
-    // Long userId = blog.getId();
     String thumbnail = blog.getThumbnailUrl();
 
     if (catid != null && !Objects.equals(catid, oldBlog.getCatID())) {
@@ -68,16 +90,12 @@ public class BlogService {
       oldBlog.setContent(content);
     }
 
-    // if (userId != null && !Objects.equals(userId, oldBlog.getUserId())) {
-    //   oldBlog.setUserId(userId);
-    // }
-
     if (
       thumbnail != null && !Objects.equals(thumbnail, oldBlog.getThumbnailUrl())
     ) {
       oldBlog.setThumbnailUrl(thumbnail);
     }
 
-    blogpostRepository.save(oldBlog);
+    return new ResponseEntity<>(blogpostRepository.save(oldBlog), HttpStatus.CREATED);
   }
 }

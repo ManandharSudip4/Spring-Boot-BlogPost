@@ -23,7 +23,7 @@ public class BlogController {
   public final BlogService blogService;
 
   @GetMapping("/blogs")
-  public List<BlogEntity> getAllBlogs() {
+  public ResponseEntity<List<BlogEntity>> getAllBlogs() {
     return blogService.getAllBlogs();
   }
 
@@ -31,25 +31,26 @@ public class BlogController {
   public ResponseEntity<BlogEntity> getBlogByID(
     @PathVariable("id") Long blogID
   ) {
-    BlogEntity myBlog = blogService.getBlogByID(blogID);
-    return new ResponseEntity<>(myBlog, HttpStatus.OK);
+    return blogService.getBlogByID(blogID);
   }
 
   @PostMapping("/blog")
-  public void addNewBlog(@RequestBody BlogEntity blog) {
-    blogService.addNewBlog(blog);
+  public ResponseEntity<HttpStatus> addNewBlog(@RequestBody BlogEntity blog) {
+    return blogService.addNewBlog(blog);
   }
 
   @DeleteMapping("blog/{id}")
-  public void deleteBlogByID(@PathVariable("id") Long blogID) {
-    blogService.deleteBlogByID(blogID);
+  public ResponseEntity<HttpStatus> deleteBlogByID(
+    @PathVariable("id") Long blogID
+  ) {
+    return blogService.deleteBlogByID(blogID);
   }
 
   @PutMapping("/blog/{blogId}")
-  public void updateBlog(
+  public ResponseEntity<BlogEntity> updateBlog(
     @PathVariable("blogId") Long blogId,
     @RequestBody BlogEntity blog
   ) {
-    blogService.updateBlog(blogId, blog);
+    return blogService.updateBlog(blogId, blog);
   }
 }
