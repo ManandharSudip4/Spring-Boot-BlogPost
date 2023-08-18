@@ -1,6 +1,6 @@
 package com.mstech.springblogpost.service;
 
-import com.mstech.springblogpost.allfunctions.GetUserFromJwt;
+import com.mstech.springblogpost.allfunctions.MSFunction;
 import com.mstech.springblogpost.entity.CommentEntity;
 import com.mstech.springblogpost.repositories.BlogpostRepository;
 import com.mstech.springblogpost.repositories.CommentsRepository;
@@ -20,7 +20,7 @@ public class CommentsService {
   private final CommentsRepository commentsRepository;
   private final BlogpostRepository blogpostRepository;
   private final UserEntityRepository userEntityRepository;
-  private final GetUserFromJwt getUserFromJwt;
+  private final MSFunction getUserFromJwt;
 
   public ResponseEntity<List<CommentEntity>> getCommentsForBlog(Long blogId) {
     List<CommentEntity> comment = commentsRepository.findByBlogEntityId(blogId);

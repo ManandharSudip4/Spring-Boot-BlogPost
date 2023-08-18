@@ -1,6 +1,6 @@
 package com.mstech.springblogpost.service;
 
-import com.mstech.springblogpost.allfunctions.GetUserFromJwt;
+import com.mstech.springblogpost.allfunctions.MSFunction;
 import com.mstech.springblogpost.entity.BlogEntity;
 import com.mstech.springblogpost.exceptions.ResourceNotFoundException;
 import com.mstech.springblogpost.repositories.BlogpostRepository;
@@ -19,7 +19,7 @@ public class BlogService {
 
   private final BlogpostRepository blogpostRepository;
   private final UserEntityRepository userEntityRepository;
-  private final GetUserFromJwt getUserFromJwt;
+  private final MSFunction msFunction;
 
   public ResponseEntity<List<BlogEntity>> getAllBlogs() {
     try {
@@ -34,9 +34,7 @@ public class BlogService {
     BlogEntity myBlog = blogpostRepository
       .findById(blogId)
       .orElseThrow(() ->
-        new ResourceNotFoundException(
-          "Blog with ID: " + blogId + " doesn't exist."
-        )
+        new ResourceNotFoundException(msFunction.errorDesc(blogId, "Retrieve"))
       );
     // This is how we access UserEntity from Blog....
     // UserEntity user = myBlog.getUserEntity();
@@ -45,38 +43,40 @@ public class BlogService {
   }
 
   public ResponseEntity<HttpStatus> addNewBlog(BlogEntity blog) {
-    var myUser = getUserFromJwt.getCurrentActiveUser();
+    var myUser = msFunction.getCurrentActiveUser();
     userEntityRepository
       .findByEmail(myUser.getEmail())
       .map(user -> {
         blog.setUserEntity(user);
         return blogpostRepository.save(blog);
       })
-      .orElseThrow(() -> new IllegalStateException("This blog does not exists")
+      .orElseThrow(() ->
+        new ResourceNotFoundException("You are not authorized to add the blog.")
       );
 
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
-  public ResponseEntity<HttpStatus> deleteBlogByID(Long blogID) {
-    boolean exists = blogpostRepository.existsById(blogID);
+  public ResponseEntity<HttpStatus> deleteBlogByID(Long blogId) {
+    boolean exists = blogpostRepository.existsById(blogId);
 
     if (!exists) {
-      throw new IllegalStateException(
-        "Blog ID: " + blogID + " does not exist."
+      throw new ResourceNotFoundException(
+        msFunction.errorDesc(blogId, "Delete")
       );
     }
 
-    blogpostRepository.deleteById(blogID);
+    blogpostRepository.deleteById(blogId);
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
   @Transactional
-  public ResponseEntity<BlogEntity> updateBlog(Long blogID, BlogEntity blog) {
+  public ResponseEntity<BlogEntity> updateBlog(Long blogId, BlogEntity blog) {
     BlogEntity oldBlog = blogpostRepository
-      .findById(blogID)
-      .orElseThrow(() -> new IllegalStateException("This blog does not exists.")
+      .findById(blogId)
+      .orElseThrow(() ->
+        new ResourceNotFoundException(msFunction.errorDesc(blogId, "Update"))
       );
 
     Long catid = blog.getCatID();
