@@ -36,7 +36,14 @@ public class MSFunction {
     return Optional.empty();
   }
 
-  public String errorDesc(Long blogId, String category) {
-    return category + " Error: Blog with ID: " + blogId + " doesn't exist.";
+  public String errorDesc(Long blogId, String category, String errorType) {
+    return (
+      errorType +
+      " Error: " +
+      category +
+      " with ID: " +
+      blogId +
+      " doesn't exist."
+    );
   }
 }

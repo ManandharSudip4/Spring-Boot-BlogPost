@@ -2,6 +2,7 @@ package com.mstech.springblogpost.service;
 
 import com.mstech.springblogpost.allfunctions.MSFunction;
 import com.mstech.springblogpost.entity.CommentEntity;
+import com.mstech.springblogpost.exceptions.ResourceNotFoundException;
 import com.mstech.springblogpost.repositories.BlogpostRepository;
 import com.mstech.springblogpost.repositories.CommentsRepository;
 import com.mstech.springblogpost.repositories.UserEntityRepository;
@@ -20,7 +21,7 @@ public class CommentsService {
   private final CommentsRepository commentsRepository;
   private final BlogpostRepository blogpostRepository;
   private final UserEntityRepository userEntityRepository;
-  private final MSFunction getUserFromJwt;
+  private final MSFunction msFunction;
 
   public ResponseEntity<List<CommentEntity>> getCommentsForBlog(Long blogId) {
     List<CommentEntity> comment = commentsRepository.findByBlogEntityId(blogId);
@@ -31,7 +32,7 @@ public class CommentsService {
     Long blogId,
     CommentEntity commentRequest
   ) {
-    var myUser = getUserFromJwt.getCurrentActiveUser();
+    var myUser = msFunction.getCurrentActiveUser();
 
     userEntityRepository
       .findByEmail(myUser.getEmail())
@@ -46,23 +47,16 @@ public class CommentsService {
                 commentsRepository.save(commentRequest);
               },
               () -> {
-                throw new IllegalStateException("This blog does not exist");
+                throw new ResourceNotFoundException(
+                  msFunction.errorDesc(blogId, "Blog", "Retrieve")
+                );
               }
             );
         },
         () -> {
-          throw new IllegalStateException("User not found");
+          throw new ResourceNotFoundException("User not found");
         }
       );
-
-    // CommentEntity comment = blogpostRepository
-    //   .findById(blogId)
-    //   .map(blog -> {
-    //     commentRequest.setBlogEntity(blog);
-    //     return commentsRepository.save(commentRequest);
-    //   })
-    //   .orElseThrow(() -> new IllegalStateException("This blog does not exists")
-    //   );
 
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
@@ -74,7 +68,7 @@ public class CommentsService {
   ) {
     CommentEntity comment = commentsRepository
       .findById(commentId)
-      .orElseThrow(() -> new IllegalStateException("This comment not found."));
+      .orElseThrow(() -> new ResourceNotFoundException(msFunction.errorDesc(commentId, "Comment", "Update")));
 
     String newComment = commentRequest.getComment();
 
@@ -91,6 +85,14 @@ public class CommentsService {
   }
 
   public ResponseEntity<HttpStatus> deleteComment(Long commentId) {
+    boolean exist = commentsRepository.existsById(commentId);
+
+    if (!exist) {
+      throw new ResourceNotFoundException(
+        msFunction.errorDesc(commentId, "Comment", "Delete")
+      );
+    }
+
     commentsRepository.deleteById(commentId);
 
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);

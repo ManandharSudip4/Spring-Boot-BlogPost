@@ -34,7 +34,9 @@ public class BlogService {
     BlogEntity myBlog = blogpostRepository
       .findById(blogId)
       .orElseThrow(() ->
-        new ResourceNotFoundException(msFunction.errorDesc(blogId, "Retrieve"))
+        new ResourceNotFoundException(
+          msFunction.errorDesc(blogId, "Blog", "Retrieve")
+        )
       );
     // This is how we access UserEntity from Blog....
     // UserEntity user = myBlog.getUserEntity();
@@ -62,7 +64,7 @@ public class BlogService {
 
     if (!exists) {
       throw new ResourceNotFoundException(
-        msFunction.errorDesc(blogId, "Delete")
+        msFunction.errorDesc(blogId, "Blog", "Delete")
       );
     }
 
@@ -76,7 +78,9 @@ public class BlogService {
     BlogEntity oldBlog = blogpostRepository
       .findById(blogId)
       .orElseThrow(() ->
-        new ResourceNotFoundException(msFunction.errorDesc(blogId, "Update"))
+        new ResourceNotFoundException(
+          msFunction.errorDesc(blogId, "Blog", "Update")
+        )
       );
 
     Long catid = blog.getCatID();
