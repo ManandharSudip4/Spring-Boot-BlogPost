@@ -2,6 +2,7 @@ package com.mstech.springblogpost.service;
 
 import com.mstech.springblogpost.allfunctions.GetUserFromJwt;
 import com.mstech.springblogpost.entity.BlogEntity;
+import com.mstech.springblogpost.exceptions.ResourceNotFoundException;
 import com.mstech.springblogpost.repositories.BlogpostRepository;
 import com.mstech.springblogpost.repositories.UserEntityRepository;
 import java.util.List;
@@ -30,19 +31,17 @@ public class BlogService {
   }
 
   public ResponseEntity<BlogEntity> getBlogByID(Long blogId) {
-    try {
-      BlogEntity myBlog = blogpostRepository
-        .findById(blogId)
-        .orElseThrow(() ->
-          new IllegalStateException("This blog does not exists.")
-        );
-      // This is how we access UserEntity from Blog....
-      // UserEntity user = myBlog.getUserEntity();
-      // System.out.println("User Email: "+ user.getEmail());
-      return new ResponseEntity<>(myBlog, HttpStatus.OK);
-    } catch (Exception e) {
-      return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+    BlogEntity myBlog = blogpostRepository
+      .findById(blogId)
+      .orElseThrow(() ->
+        new ResourceNotFoundException(
+          "Blog with ID: " + blogId + " doesn't exist."
+        )
+      );
+    // This is how we access UserEntity from Blog....
+    // UserEntity user = myBlog.getUserEntity();
+    // System.out.println("User Email: "+ user.getEmail());
+    return new ResponseEntity<>(myBlog, HttpStatus.OK);
   }
 
   public ResponseEntity<HttpStatus> addNewBlog(BlogEntity blog) {
