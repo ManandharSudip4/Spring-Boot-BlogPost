@@ -1,8 +1,10 @@
 package com.mstech.springblogpost.service;
 
+import com.mstech.springblogpost.allfunctions.GetUserFromJwt;
 import com.mstech.springblogpost.entity.CommentEntity;
 import com.mstech.springblogpost.repositories.BlogpostRepository;
 import com.mstech.springblogpost.repositories.CommentsRepository;
+import com.mstech.springblogpost.repositories.UserEntityRepository;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
@@ -17,6 +19,8 @@ public class CommentsService {
 
   private final CommentsRepository commentsRepository;
   private final BlogpostRepository blogpostRepository;
+  private final UserEntityRepository userEntityRepository;
+  private final GetUserFromJwt getUserFromJwt;
 
   public ResponseEntity<List<CommentEntity>> getCommentsForBlog(Long blogId) {
     List<CommentEntity> comment = commentsRepository.findByBlogEntityId(blogId);
@@ -27,16 +31,40 @@ public class CommentsService {
     Long blogId,
     CommentEntity commentRequest
   ) {
-    CommentEntity comment = blogpostRepository
-      .findById(blogId)
-      .map(blog -> {
-        commentRequest.setBlogEntity(blog);
-        return commentsRepository.save(commentRequest);
-      })
-      .orElseThrow(() -> new IllegalStateException("This blog does not exists")
+    var myUser = getUserFromJwt.getCurrentActiveUser();
+
+    userEntityRepository
+      .findByEmail(myUser.getEmail())
+      .ifPresentOrElse(
+        user -> {
+          blogpostRepository
+            .findById(blogId)
+            .ifPresentOrElse(
+              blog -> {
+                commentRequest.setUserEntity(user);
+                commentRequest.setBlogEntity(blog);
+                commentsRepository.save(commentRequest);
+              },
+              () -> {
+                throw new IllegalStateException("This blog does not exist");
+              }
+            );
+        },
+        () -> {
+          throw new IllegalStateException("User not found");
+        }
       );
 
-    return new ResponseEntity<>(comment, HttpStatus.CREATED);
+    // CommentEntity comment = blogpostRepository
+    //   .findById(blogId)
+    //   .map(blog -> {
+    //     commentRequest.setBlogEntity(blog);
+    //     return commentsRepository.save(commentRequest);
+    //   })
+    //   .orElseThrow(() -> new IllegalStateException("This blog does not exists")
+    //   );
+
+    return new ResponseEntity<>(HttpStatus.CREATED);
   }
 
   @Transactional

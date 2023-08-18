@@ -1,9 +1,7 @@
 package com.mstech.springblogpost.controller;
 
-import com.mstech.springblogpost.allfunctions.GetUserFromJwt;
 import com.mstech.springblogpost.entity.CommentEntity;
 import com.mstech.springblogpost.service.CommentsService;
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,17 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class CommentsController {
 
   private final CommentsService commentsService;
-  private final GetUserFromJwt getUserFromJwt;
 
   @GetMapping("api/v1/blog/{blogId}/comments")
   public ResponseEntity<List<CommentEntity>> getCommentsForBlog(
     @PathVariable("blogId") Long blogID
   ) {
-    var myUser = getUserFromJwt.getCurrentActiveUser();
-
-    System.out.println(
-      "Username: " + myUser.getEmail() + "\n User Id: " + myUser.getUserId()
-    );
     return commentsService.getCommentsForBlog(blogID);
   }
 
