@@ -25,7 +25,6 @@ public class AuthController {
 
   @PostMapping("auth/register")
   public void register(@RequestBody UserEntity user) {
-    // System.out.println(user.getPassword());
     userEntityService.registerNewUser(user);
   }
 }
